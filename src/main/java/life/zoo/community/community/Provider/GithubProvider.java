@@ -14,12 +14,13 @@ public class GithubProvider {
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
 
         OkHttpClient client = new OkHttpClient();
-
-        RequestBody body = RequestBody.create(mediaType, JSON.toJSONString(accessTokenDTO));
+        RequestBody body = RequestBody.create(mediaType,JSON.toJSONString(accessTokenDTO));
         Request request = new Request.Builder()
-                .url("https://github.com/login/oauth/access_token")
+                .url("https://github.com/login/oauth/access_token?client_id=Iv1.9b0c3713a3556ce4&client_secret=00f2a7d65b09ca924f0368295b7f0689f1598017&code="
+                        +accessTokenDTO.getCode()+"&redirect_uri=http://localhost:8887/callback&state=1")
                 .post(body)
                 .build();
+
         try (Response response = client.newCall(request). execute()) {
             String string = response.body().string();
             String token = string.split("&")[0].split("=")[1];
@@ -33,8 +34,10 @@ public class GithubProvider {
     public GithubUser getUser(String accessToken) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("https://api.github.com/user?access_token=" + accessToken)
+                .url("https://api.github.com/user")
+                .header("Authorization","token "+accessToken)
                 .build();
+
         try {
             Response response = client.newCall(request).execute();
             String string = response.body().string();
